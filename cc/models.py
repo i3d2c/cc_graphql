@@ -40,7 +40,8 @@ class Ouvrage(Base):
     stroke = Column(Float)
     up = Column(Float)
 
-    components = relationship("OuvrageComponent", back_populates="ouvrage", foreign_keys="[OuvrageComponent.component_id]")
+    components = relationship("OuvrageComponent",
+            foreign_keys=[OuvrageComponent.component_id])
 
     __table_args__ = (UniqueConstraint('name', 'owner_id', name='_name_owner_id'),)
 
