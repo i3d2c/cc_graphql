@@ -12,7 +12,8 @@ class TestDatabase(unittest.TestCase):
     """Test case docstring."""
 
     def tearDown(self):
-        os.remove('database.sqlite3')
+        #os.remove('database.sqlite3')
+        pass
 
     def test_creation(self):
         session = sessionmaker()
@@ -59,13 +60,13 @@ class TestDatabase(unittest.TestCase):
         #s.add_all([placo, beton, ouvrage, component1, component2, oc1, oc2])
         #s.commit()
         
-        s.add(ouvrage)
+        s.add_all([ouvrage, component1, component2, oc1, oc2])
         s.commit()
-        ouvrage.components.append(component1)
-        ouvrage.components.append(component2)
 
 
-        resulting_ouvrage = ouvrage #Ouvrage.query.all()[0]
+        resulting_ouvrage = s.query(Ouvrage).\
+                filter(Ouvrage.name=="placo isole").\
+                join(Ouvrage.components).all()[0]
         self.assertEqual(len(resulting_ouvrage.components), 2)
-        self.assertEqual(resulting_ouvrage.components[0].name, 'BA13')
-        self.assertEqual(resulting_ouvrage.components[1].name, 'montant')
+        self.assertEqual(resulting_ouvrage.components[0].component.name, 'BA13')
+        self.assertEqual(resulting_ouvrage.components[1].component.name, 'montant')

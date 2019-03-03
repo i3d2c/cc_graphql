@@ -41,7 +41,7 @@ class Ouvrage(Base):
     up = Column(Float)
 
     components = relationship("OuvrageComponent",
-            foreign_keys=[OuvrageComponent.component_id])
+            foreign_keys=[OuvrageComponent.ouvrage_id])
 
     __table_args__ = (UniqueConstraint('name', 'owner_id', name='_name_owner_id'),)
 
