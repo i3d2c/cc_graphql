@@ -1,29 +1,27 @@
 import unittest
-import contextlib
 import os
 
-from cc.models import engine, Base, Ouvrage, Category, OuvrageComponent
-from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
 
+from cc.models import engine, Base, Ouvrage, Category, OuvrageComponent
 
-class TestDatabase(unittest.TestCase):
+
+class TestDatabaseModel(unittest.TestCase):
 
     """Test case docstring."""
 
-    def tearDown(self):
-        #os.remove('database.sqlite3')
-        pass
-
-    def test_creation(self):
+    def setUp(self):
         session = sessionmaker()
         session.configure(bind=engine)
         Base.metadata.create_all(bind=engine)
-        s = session()
+        self.session = session()
 
+    def tearDown(self):
+        os.remove('database.sqlite3')
+
+    def test_ouvrage_should_contain_its_components(self):
         # 1. Create categories
         placo = Category(owner_id=12, name='placo')
-        beton = Category(owner_id=42, name="beton")
 
         # 2. Create ouvrage and components
         ouvrage = Ouvrage(
@@ -57,14 +55,10 @@ class TestDatabase(unittest.TestCase):
                 component_formula='ceil(L/60)',
                 position=2)
 
-        #s.add_all([placo, beton, ouvrage, component1, component2, oc1, oc2])
-        #s.commit()
-        
-        s.add_all([ouvrage, component1, component2, oc1, oc2])
-        s.commit()
+        self.session.add_all([placo, ouvrage, component1, component2, oc1, oc2])
+        self.session.commit()
 
-
-        resulting_ouvrage = s.query(Ouvrage).\
+        resulting_ouvrage = self.session.query(Ouvrage).\
                 filter(Ouvrage.name=="placo isole").\
                 join(Ouvrage.components).all()[0]
         self.assertEqual(len(resulting_ouvrage.components), 2)
